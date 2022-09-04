@@ -1,0 +1,21 @@
+#include "llvm/Transforms/Utils/MyBasicPass2.h"
+
+using namespace llvm;
+
+PreservedAnalyses MyBasicPass2::run(Function &F,
+                                      FunctionAnalysisManager &AM) {
+  errs() << F.getName() << "\n";
+
+  // Create our symbol table for blocks and get from function
+  SymbolTableList<BasicBlock> block_table = F.getBasicBlockList();
+
+  // iterate through table
+  for(BasicBlock bb : block_table) {
+    errs() << bb.front().getOpcode() << "\n";
+  }
+
+  
+  return PreservedAnalyses::all();
+}
+
+
