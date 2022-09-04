@@ -764,12 +764,6 @@ def R_Joined : Joined<["-"], "R">, Group<R_Group>, Flags<[CC1Option, CoreOption]
   MetaVarName<"<remark>">, HelpText<"Enable the specified remark">;
 def S : Flag<["-"], "S">, Flags<[NoXarchOption,CC1Option,FlangOption,FC1Option]>, Group<Action_Group>,
   HelpText<"Only run preprocess and compilation steps">;
-def Tbss : JoinedOrSeparate<["-"], "Tbss">, Group<T_Group>,
-  MetaVarName<"<addr>">, HelpText<"Set starting address of BSS to <addr>">;
-def Tdata : JoinedOrSeparate<["-"], "Tdata">, Group<T_Group>,
-  MetaVarName<"<addr>">, HelpText<"Set starting address of DATA to <addr>">;
-def Ttext : JoinedOrSeparate<["-"], "Ttext">, Group<T_Group>,
-  MetaVarName<"<addr>">, HelpText<"Set starting address of TEXT to <addr>">;
 def T : JoinedOrSeparate<["-"], "T">, Group<T_Group>,
   MetaVarName<"<script>">, HelpText<"Specify <script> as linker script">;
 def U : JoinedOrSeparate<["-"], "U">, Group<Preprocessor_Group>,
@@ -843,17 +837,13 @@ def Xoffload_linker : JoinedAndSeparate<["-"], "Xoffload-linker">,
 def Xpreprocessor : Separate<["-"], "Xpreprocessor">, Group<Preprocessor_Group>,
   HelpText<"Pass <arg> to the preprocessor">, MetaVarName<"<arg>">;
 def X_Flag : Flag<["-"], "X">, Group<Link_Group>;
-def X_Joined : Joined<["-"], "X">, IgnoredGCCCompat;
 def Z_Flag : Flag<["-"], "Z">, Group<Link_Group>;
-// FIXME: All we do with this is reject it. Remove.
-def Z_Joined : Joined<["-"], "Z">;
 def all__load : Flag<["-"], "all_load">;
 def allowable__client : Separate<["-"], "allowable_client">;
 def ansi : Flag<["-", "--"], "ansi">, Group<CompileOnly_Group>;
 def arch__errors__fatal : Flag<["-"], "arch_errors_fatal">;
 def arch : Separate<["-"], "arch">, Flags<[NoXarchOption]>;
 def arch__only : Separate<["-"], "arch_only">;
-def a : Joined<["-"], "a">;
 def autocomplete : Joined<["--"], "autocomplete=">;
 def bind__at__load : Flag<["-"], "bind_at_load">;
 def bundle__loader : Separate<["-"], "bundle_loader">;
@@ -1147,7 +1137,7 @@ def fallow_unsupported : Flag<["-"], "fallow-unsupported">, Group<f_Group>;
 def fapple_kext : Flag<["-"], "fapple-kext">, Group<f_Group>, Flags<[CC1Option]>,
   HelpText<"Use Apple's kernel extensions ABI">,
   MarshallingInfoFlag<LangOpts<"AppleKext">>;
-def fstrict_flex_arrays_EQ : Joined<["-"], "fstrict-flex-arrays=">,Group<f_Group>,
+def fstrict_flex_arrays_EQ : Joined<["-"], "fstrict-flex-arrays=">, Group<f_Group>,
   MetaVarName<"<n>">, Values<"0,1,2">,
   LangOpts<"StrictFlexArrays">,
   Flags<[CC1Option]>,
@@ -2956,8 +2946,9 @@ def fvisibility_externs_nodllstorageclass_EQ : Joined<["-"], "fvisibility-extern
   HelpText<"The visibility for external declarations without an explicit DLL dllstorageclass [-fvisibility-from-dllstorageclass]">,
   MarshallingInfoVisibility<LangOpts<"ExternDeclNoDLLStorageClassVisibility">, "HiddenVisibility">,
   ShouldParseIf<fvisibility_from_dllstorageclass.KeyPath>;
-def fvisibility_EQ : Joined<["-"], "fvisibility=">, Group<f_Group>,
-  HelpText<"Set the default symbol visibility for all global declarations">, Values<"hidden,default">;
+def fvisibility_EQ : Joined<["-"], "fvisibility=">, Group<f_Group>, Flags<[CC1Option]>,
+  HelpText<"Set the default symbol visibility for all global definitions">,
+  MarshallingInfoVisibility<LangOpts<"ValueVisibilityMode">, "DefaultVisibility">;
 defm visibility_inlines_hidden : BoolFOption<"visibility-inlines-hidden",
   LangOpts<"InlineVisibilityHidden">, DefaultFalse,
   PosFlag<SetTrue, [CC1Option], "Give inline C++ member functions hidden visibility by default">,
@@ -4073,8 +4064,9 @@ def print_target_triple : Flag<["-", "--"], "print-target-triple">,
   HelpText<"Print the normalized target triple">, Flags<[FlangOption]>;
 def print_effective_triple : Flag<["-", "--"], "print-effective-triple">,
   HelpText<"Print the effective target triple">, Flags<[FlangOption]>;
-def print_multiarch : Flag<["-", "--"], "print-multiarch">,
-  HelpText<"Print the multiarch target triple">;
+// GCC --disable-multiarch, GCC --enable-multiarch (upstream and Debian
+// specific) have different behaviors. We choose not to support the option.
+def : Flag<["-", "--"], "print-multiarch">, Flags<[Unsupported]>;
 def print_prog_name_EQ : Joined<["-", "--"], "print-prog-name=">,
   HelpText<"Print the full program path of <name>">, MetaVarName<"<name>">;
 def print_resource_dir : Flag<["-", "--"], "print-resource-dir">,
@@ -4277,7 +4269,7 @@ def : Flag<["-"], "integrated-as">, Alias<fintegrated_as>, Flags<[NoXarchOption]
 def : Flag<["-"], "no-integrated-as">, Alias<fno_integrated_as>,
       Flags<[CC1Option, FlangOption, NoXarchOption]>;
 
-def working_directory : JoinedOrSeparate<["-"], "working-directory">, Flags<[CC1Option]>,
+def working_directory : Separate<["-"], "working-directory">, Flags<[CC1Option]>,
   HelpText<"Resolve file paths relative to the specified directory">,
   MarshallingInfoString<FileSystemOpts<"WorkingDir">>;
 def working_directory_EQ : Joined<["-"], "working-directory=">, Flags<[CC1Option]>,
@@ -4367,7 +4359,6 @@ def _print_diagnostic_categories : Flag<["--"], "print-diagnostic-categories">;
 def _print_file_name : Separate<["--"], "print-file-name">, Alias<print_file_name_EQ>;
 def _print_missing_file_dependencies : Flag<["--"], "print-missing-file-dependencies">, Alias<MG>;
 def _print_prog_name : Separate<["--"], "print-prog-name">, Alias<print_prog_name_EQ>;
-def _profile_blocks : Flag<["--"], "profile-blocks">, Alias<a>;
 def _profile : Flag<["--"], "profile">, Alias<p>;
 def _resource_EQ : Joined<["--"], "resource=">, Alias<fcompile_resource_EQ>;
 def _resource : Separate<["--"], "resource">, Alias<fcompile_resource_EQ>;
@@ -5291,6 +5282,9 @@ def msave_temp_labels : Flag<["-"], "msave-temp-labels">,
            "Note this may change .s semantics and shouldn't generally be used "
            "on compiler-generated code.">,
   MarshallingInfoFlag<CodeGenOpts<"SaveTempLabels">>;
+def mno_type_check : Flag<["-"], "mno-type-check">,
+  HelpText<"Don't perform type checking of the assembly code (wasm only)">,
+  MarshallingInfoFlag<CodeGenOpts<"NoTypeCheck">>;
 def fno_math_builtin : Flag<["-"], "fno-math-builtin">,
   HelpText<"Disable implicit builtin knowledge of math functions">,
   MarshallingInfoFlag<LangOpts<"NoMathBuiltin">>;
@@ -6066,12 +6060,9 @@ def stack_protector : Separate<["-"], "stack-protector">,
 def stack_protector_buffer_size : Separate<["-"], "stack-protector-buffer-size">,
   HelpText<"Lower bound for a buffer to be considered for stack protection">,
   MarshallingInfoInt<CodeGenOpts<"SSPBufferSize">, "8">;
-def fvisibility : Separate<["-"], "fvisibility">,
-  HelpText<"Default type and symbol visibility">,
-  MarshallingInfoVisibility<LangOpts<"ValueVisibilityMode">, "DefaultVisibility">;
-def ftype_visibility : Separate<["-"], "ftype-visibility">,
+def ftype_visibility : Joined<["-"], "ftype-visibility=">,
   HelpText<"Default type visibility">,
-  MarshallingInfoVisibility<LangOpts<"TypeVisibilityMode">, fvisibility.KeyPath>;
+  MarshallingInfoVisibility<LangOpts<"TypeVisibilityMode">, fvisibility_EQ.KeyPath>;
 def fapply_global_visibility_to_externs : Flag<["-"], "fapply-global-visibility-to-externs">,
   HelpText<"Apply global symbol visibility to external declarations without an explicit visibility">,
   MarshallingInfoFlag<LangOpts<"SetVisibilityForExternDecls">>;
@@ -6207,20 +6198,20 @@ def fmodules_strict_context_hash : Flag<["-"], "fmodules-strict-context-hash">,
   HelpText<"Enable hashing of all compiler options that could impact the "
            "semantics of a module in an implicit build">,
   MarshallingInfoFlag<HeaderSearchOpts<"ModulesStrictContextHash">>;
-def c_isystem : JoinedOrSeparate<["-"], "c-isystem">, MetaVarName<"<directory>">,
+def c_isystem : Separate<["-"], "c-isystem">, MetaVarName<"<directory>">,
   HelpText<"Add directory to the C SYSTEM include search path">;
-def objc_isystem : JoinedOrSeparate<["-"], "objc-isystem">,
+def objc_isystem : Separate<["-"], "objc-isystem">,
   MetaVarName<"<directory>">,
   HelpText<"Add directory to the ObjC SYSTEM include search path">;
-def objcxx_isystem : JoinedOrSeparate<["-"], "objcxx-isystem">,
+def objcxx_isystem : Separate<["-"], "objcxx-isystem">,
   MetaVarName<"<directory>">,
   HelpText<"Add directory to the ObjC++ SYSTEM include search path">;
-def internal_isystem : JoinedOrSeparate<["-"], "internal-isystem">,
+def internal_isystem : Separate<["-"], "internal-isystem">,
   MetaVarName<"<directory>">,
   HelpText<"Add directory to the internal system include search path; these "
            "are assumed to not be user-provided and are used to model system "
            "and standard headers' paths.">;
-def internal_externc_isystem : JoinedOrSeparate<["-"], "internal-externc-isystem">,
+def internal_externc_isystem : Separate<["-"], "internal-externc-isystem">,
   MetaVarName<"<directory>">,
   HelpText<"Add directory to the internal system include search path with "
            "implicit extern \"C\" semantics; these are assumed to not be "
