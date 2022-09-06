@@ -12,6 +12,7 @@ endif()
 
 add_llvm_library( LLVMMyBasic MODULE BUILDTREE_ONLY
   MyBasicHello.cpp
+  OptPrinterPass.cpp
   
   DEPENDS
   intrinsics_gen

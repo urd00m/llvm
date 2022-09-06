@@ -81,7 +81,7 @@ add_llvm_component_library(LLVMTransformUtils
   ValueMapper.cpp
   VNCoercion.cpp
   MyBasicPass.cpp
-  #MyBasicPass2.cpp
+  MyBasicPass2.cpp
 
   ADDITIONAL_HEADER_DIRS
   ${LLVM_MAIN_INCLUDE_DIR}/llvm/Transforms
