@@ -1,8 +1,8 @@
-#include "llvm/Transforms/Utils/MyBasicPass4.h"
+#include "llvm/Transforms/Utils/MyBasicPass5.h"
 
 using namespace llvm;
 
-bool MyBasicPass4::runOnModule(Module& M) {
+bool MyBasicPass5::runOnModule(Module& M) {
   bool inserted_into_function = false;
 
   // Get context
@@ -37,13 +37,15 @@ bool MyBasicPass4::runOnModule(Module& M) {
 
   // creates the format string 
   llvm::Constant *PrintfFormatStr = llvm::ConstantDataArray::getString(CTX, "(llvm) Hello from: %s\n(llvm)   number of arguments: %d\n");
+  llvm::Constant *PrintfBinaryStr = llvm::ConstantDataArray::getString(CTX, "(llvm binary) Hello from binary statement\n");
 
   // inject format string (injected as PrintfFormatStr as type string) variable
-  // TODO llvm::Constant? 
   Constant *PrintfFormatStrVar = M.getOrInsertGlobal("PrintfFormatStr", PrintfFormatStr->getType());
+  Constant *PrintfBinaryStrVar = M.getOrInsertGlobal("PrintfBinaryStr", PrintfBinaryStr->getType());
 
   // Initialize global variable
   dyn_cast<GlobalVariable>(PrintfFormatStrVar)->setInitializer(PrintfFormatStr);
+  dyn_cast<GlobalVariable>(PrintfBinaryStrVar)->setInitializer(PrintfBinaryStr);
 
   
   /*
@@ -69,6 +71,21 @@ bool MyBasicPass4::runOnModule(Module& M) {
     // inject printf call (function call, args)
     Builder.CreateCall(Printf, {FormatStrPtr, FuncName, Builder.getInt32(F.arg_size())});
 
+    // inject after binary operation
+    for(Function::iterator bb = F.begin(), e = F.end(); bb != e; bb++) {
+      for(BasicBlock::iterator i = bb->begin(), e = bb->end(); i != e; i++) {
+	// check if is binary
+	if(i->isBinaryOp() == true) {
+	  errs() << "Found one!\n";
+
+	  // insert print statement
+	  Builder.SetInsertPoint(i->getNextNode());
+	  llvm::Value *BinaryStrPtr = Builder.CreatePointerCast(PrintfBinaryStrVar, PrintfArgTy, "formatStr");
+	  Builder.CreateCall(Printf, {BinaryStrPtr});
+	}
+      }
+    }
+    
     // mark as inserted
     inserted_into_function = true;
   }
@@ -76,7 +93,7 @@ bool MyBasicPass4::runOnModule(Module& M) {
   return inserted_into_function;
 }
 
-PreservedAnalyses MyBasicPass4::run(Module& M, ModuleAnalysisManager& MAM) {
+PreservedAnalyses MyBasicPass5::run(Module& M, ModuleAnalysisManager& MAM) {
   bool changed = runOnModule(M);
 
   return changed ? PreservedAnalyses::none() : PreservedAnalyses::all();

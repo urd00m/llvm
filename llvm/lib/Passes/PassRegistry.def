@@ -127,6 +127,7 @@ MODULE_PASS("memprof-module", ModuleMemProfilerPass())
 MODULE_PASS("poison-checking", PoisonCheckingPass())
 MODULE_PASS("pseudo-probe-update", PseudoProbeUpdatePass())
 MODULE_PASS("mybasicpass4", MyBasicPass4())
+MODULE_PASS("mybasicpass5", MyBasicPass5())
 #undef MODULE_PASS
 
 #ifndef MODULE_PASS_WITH_PARAMS

@@ -84,6 +84,7 @@ add_llvm_component_library(LLVMTransformUtils
   MyBasicPass2.cpp
   MyBasicPass3.cpp
   MyBasicPass4.cpp
+  MyBasicPass5.cpp
 
   ADDITIONAL_HEADER_DIRS
   ${LLVM_MAIN_INCLUDE_DIR}/llvm/Transforms
