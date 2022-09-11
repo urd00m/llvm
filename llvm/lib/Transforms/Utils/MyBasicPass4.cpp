@@ -60,6 +60,9 @@ bool MyBasicPass4::runOnModule(Module& M) {
     // create a global string with func name
     auto FuncName = Builder.CreateGlobalStringPtr(F.getName());
 
+    // debug
+    errs() << "Running transformation on pass " << F.getName() << "\n";
+    
     // casting, PrintfFormatStrVar is an array of chars we need a pointer to chars 
     llvm::Value *FormatStrPtr = Builder.CreatePointerCast(PrintfFormatStrVar, PrintfArgTy, "formatStr");
 
