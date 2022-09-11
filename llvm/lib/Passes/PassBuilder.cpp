@@ -228,6 +228,7 @@
 #include "llvm/Transforms/Utils/MyBasicPass.h"
 #include "llvm/Transforms/Utils/MyBasicPass2.h"
 #include "llvm/Transforms/Utils/MyBasicPass3.h"
+#include "llvm/Transforms/Utils/MyBasicPass4.h"
 #include "llvm/Transforms/Utils/InjectTLIMappings.h"
 #include "llvm/Transforms/Utils/InstructionNamer.h"
 #include "llvm/Transforms/Utils/LCSSA.h"

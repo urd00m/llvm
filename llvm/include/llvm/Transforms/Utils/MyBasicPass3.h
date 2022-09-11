@@ -9,11 +9,10 @@
 
 namespace llvm {
 
-class MyBasicPass3 : public PassInfoMixin<MyBasicPass3> {
-public:
-  PreservedAnalyses run(Function &F, FunctionAnalysisManager &AM);
-};
-
+  class MyBasicPass3 : public PassInfoMixin<MyBasicPass3> {
+  public:
+    PreservedAnalyses run(Function &F, FunctionAnalysisManager &AM);
+  };
 } // namespace llvm
 
 #endif 
